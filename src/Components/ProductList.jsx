@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 
-const ProductList = ({ products, onDelete, onEdit, onSort, sortConfig }) => {
+const ProductList = memo(({ products, onDelete, onEdit, onSort, sortConfig }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(5);
   const menuRef = useRef(null);
+
+  const totalProducts = products.length;
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -19,9 +24,9 @@ const ProductList = ({ products, onDelete, onEdit, onSort, sortConfig }) => {
   }, []);
 
   const toggleMenu = (productId, event) => {
-    event.stopPropagation(); // Evita que otros eventos interfieran
+    event.stopPropagation();
     if (openMenuId === productId) {
-      setOpenMenuId(null); // Cierra el menú si ya está abierto
+      setOpenMenuId(null);
     } else {
       const buttonRect = event.currentTarget.getBoundingClientRect();
       setMenuPosition({
@@ -39,54 +44,39 @@ const ProductList = ({ products, onDelete, onEdit, onSort, sortConfig }) => {
     return '↕';
   };
 
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      {/* Usamos table-layout: fixed para mantener los anchos de las columnas fijos */}
       <table className="min-w-full table-fixed">
         <thead className="bg-gray-50">
           <tr>
-            {/* Columna ID */}
             <th className="py-3 px-6 text-left text-sm font-medium text-gray-700 cursor-pointer w-[100px]" onClick={() => onSort('id')}>
               ID <span className="ml-1">{getSortIcon('id')}</span>
             </th>
-
-            {/* Columna Name */}
             <th className="py-3 px-6 text-left text-sm font-medium text-gray-700 cursor-pointer w-[400px]" onClick={() => onSort('name')}>
               Name <span className="ml-1">{getSortIcon('name')}</span>
             </th>
-
-            {/* Columna Category */}
             <th className="py-3 px-6 text-left text-sm font-medium text-gray-700 cursor-pointer w-[200px]" onClick={() => onSort('category')}>
               Category <span className="ml-1">{getSortIcon('category')}</span>
             </th>
-
-            {/* Columna Actions (vacía) */}
             <th className="py-3 px-6 text-left text-sm font-medium text-gray-700 w-[100px]"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {products.map((product) => (
+          {currentProducts.map((product) => (
             <tr key={product.id} className="hover:bg-gray-50 transition-colors duration-200">
-              {/* Celda de ID */}
-              <td className="py-4 px-6 text-sm text-gray-700 overflow-hidden overflow-ellipsis whitespace-nowrap">
-                {product.id}
-              </td>
-
-              {/* Celda de Name */}
-              <td className="py-4 px-6 text-sm text-gray-700 break-words whitespace-normal max-w-[400px]">
-                {product.name}
-              </td>
-
-              {/* Celda de Category */}
-              <td className="py-4 px-6 text-sm text-gray-700 break-words whitespace-normal max-w-[200px]">
-                {product.category}
-              </td>
-
-              {/* Celda de Actions */}
+              <td className="py-4 px-6 text-sm text-gray-700 overflow-hidden overflow-ellipsis whitespace-nowrap">{product.id}</td>
+              <td className="py-4 px-6 text-sm text-gray-700 break-words whitespace-normal max-w-[400px]">{product.name}</td>
+              <td className="py-4 px-6 text-sm text-gray-700 break-words whitespace-normal max-w-[200px]">{product.category}</td>
               <td className="py-4 px-6 text-sm text-gray-700">
                 <div className="relative flex justify-end">
-                  <button onClick={(e) => toggleMenu(product.id, e)} className="p-2 focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <button onClick={(e) => toggleMenu(product.id, e)} className="p-2 focus:outline-none text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                     </svg>
                   </button>
@@ -122,8 +112,28 @@ const ProductList = ({ products, onDelete, onEdit, onSort, sortConfig }) => {
           ))}
         </tbody>
       </table>
+
+      <div className="flex justify-between items-center py-3 px-6">
+        <button
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-lg text-white hover:bg-blue-400 disabled:bg-blue-100 disabled:opacity-50 ${currentPage === 1 ? 'bg-blue-100' : 'bg-blue-500'}`}
+        >
+          Previous
+        </button>
+        <span className="text-sm text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded-lg text-white hover:bg-blue-400 disabled:bg-blue-100 disabled:opacity-50 ${currentPage === totalPages ? 'bg-blue-100' : 'bg-blue-500'}`}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
-};
+});
 
 export default ProductList;

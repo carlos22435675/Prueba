@@ -51,7 +51,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct, editingProduct }) => {
           <XMarkIcon className="h-6 w-6" />
         </button>
 
-        <h2 className="text-xl font-bold mb-2">
+        <h2 className="text-xl font-bold mb-2 text-gray-700">
           {editingProduct ? 'Edit Product' : 'Add New Product'}
         </h2>
         {/* Subtítulo debajo del título */}
@@ -68,7 +68,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct, editingProduct }) => {
               value={formik.values.name}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 text-black"
               placeholder="Enter product name"
             />
             {formik.touched.name && formik.errors.name ? (
@@ -78,19 +78,22 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct, editingProduct }) => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Category</label>
             <select
-              name="category"
-              value={formik.values.category}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
-            >
-              <option value="" disabled>Select a category</option>
-              {['Hygiene', 'Food', 'Electronics', 'Clothing', 'Other'].map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+  name="category"
+  value={formik.values.category}
+  onChange={formik.handleChange}
+  onBlur={formik.handleBlur}
+  className="w-full px-4 py-2 border rounded-md text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+>
+  <option value="" disabled className="text-gray-500">
+    Select a category
+  </option>
+  {['Hygiene', 'Food', 'Electronics', 'Clothing', 'Other'].map((cat) => (
+    <option key={cat} value={cat} className="text-gray-700">
+      {cat}
+    </option>
+  ))}
+</select>
+
             {formik.touched.category && formik.errors.category ? (
               <div className="text-red-500 text-sm mt-1">{formik.errors.category}</div>
             ) : null}
@@ -102,7 +105,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct, editingProduct }) => {
               value={formik.values.description}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 text-black"
               placeholder="Write a description"
             />
             {formik.touched.description && formik.errors.description ? (
