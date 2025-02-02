@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import ProductList from './ProductList';
 import AddProductModal from './AddProductModal';
 import ConfirmationModal from './ConfirmationModal';
@@ -7,18 +6,10 @@ import { SunIcon, MoonIcon } from '@heroicons/react/24/solid'; // Importa los í
 import { PlusCircleIcon } from '@heroicons/react/24/solid';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { AuthContext } from '../AuthContext'; // Importa el contexto de autenticación
+import { AuthContext } from '../AuthContext';
 
 const Dashboard = () => {
   const { isAuthenticated } = useContext(AuthContext); // Obtén el estado de autenticación
-  const navigate = useNavigate(); // Hook para redirigir al usuario
-
-  // Redirige al login si no está autenticado
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, navigate]);
 
   const [products, setProducts] = useState(() => {
     const savedProducts = JSON.parse(localStorage.getItem('products')) || [
